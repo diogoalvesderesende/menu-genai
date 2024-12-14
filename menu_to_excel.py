@@ -8,7 +8,7 @@ from openai import OpenAI
 import re
 import io
 
-# Set up OpenAI API
+# Configuração da API OpenAI
 api_key = st.secrets["openai_api"]
 client = OpenAI(api_key=api_key)
 MODEL = "gpt-4o"
@@ -16,7 +16,6 @@ MODEL2 = "gpt-4o-mini"
 
 translation_cache = {}
 
-# Convert PDF to images
 def pdf_to_jpeg(pdf_file):
     pdf_document = fitz.open(stream=pdf_file.read(), filetype="pdf")
     images = []
@@ -27,17 +26,14 @@ def pdf_to_jpeg(pdf_file):
         images.append(img)
     return images
 
-# Encode PIL image to base64
 def encode_image_pil(img):
-    # Ensure the image is in RGB mode for JPEG
+    # Garantir que a imagem está em modo RGB para JPEG
     if img.mode != "RGB":
         img = img.convert("RGB")
     buffered = io.BytesIO()
     img.save(buffered, format="JPEG")
     return base64.b64encode(buffered.getvalue()).decode("utf-8")
 
-
-# Categorize menu language
 def categorize_menu_language(menu_language):
     prompt = f"""
     Based on the input '{menu_language}', categorize it as one of the following:
@@ -59,7 +55,6 @@ def categorize_menu_language(menu_language):
     )
     return response.choices[0].message.content.strip()
 
-# Convert images to a dataframe by extracting menu data
 def process_image_to_excel(images, menu_language):
     df = pd.DataFrame(columns=[
         'CategoryTitleDefault', 'SubcategoryTitleDefault', 'ItemNameDefault', 'ItemDescriptionDefault',
@@ -89,7 +84,7 @@ Output in Markdown table format:
             model=MODEL,
             messages=[
                 {"role": "system", "content": system_prompt},
-                {"role": "user", 
+                {"role": "user",
                  "content": [
                      {"type": "text", "text": "Convert this menu image to a structured Excel sheet format."},
                      {"type": "image_url", "image_url": {"url": f"data:image/png;base64,{base64_image}"}}
@@ -103,20 +98,16 @@ Output in Markdown table format:
         for row in menu_data:
             if row.startswith('|') and not row.startswith('|-'):
                 columns = [col.strip() for col in row.split('|')[1:-1]]
-                # Check if this looks like a header row
                 if 'CategoryTitleDefault' in columns:
-                    # If headers are not yet added, just mark headers_added
                     if not headers_added:
                         headers_added = True
                     else:
-                        # Skip if headers encountered again
                         continue
                     continue
 
                 if len(columns) == len(df.columns):
                     df.loc[len(df)] = columns
 
-    # Add translation columns
     required_columns = [
         'CategoryTitleDefault', 'SubcategoryTitleDefault', 'ItemNameDefault', 'ItemDescriptionDefault',
         'ItemPrice',
@@ -132,22 +123,19 @@ Output in Markdown table format:
 
     return df
 
-# Map selected language to codes
 language_map = {
-    "British English": "En",
-    "European Portuguese": "Pt",
-    "European French": "Fr",
-    "German (Germany)": "De",
-    "European Spanish": "Es"
+    "Inglês Britânico": "En",
+    "Português Europeu": "Pt",
+    "Francês Europeu": "Fr",
+    "Alemão (Alemanha)": "De",
+    "Espanhol Europeu": "Es"
 }
 
 def translate_text(text, src_lang_code, tgt_lang_code):
-    # Check cache
     cache_key = (text, tgt_lang_code)
     if cache_key in translation_cache:
         return translation_cache[cache_key]
 
-    # Simple translation prompt
     system_prompt = f"You are a translator for a restaurant. Assume the intended meaning is restaurant vocabulary. Translate from {src_lang_code} to {tgt_lang_code}. Return only the translated text."
     user_prompt = f"Translate this text:\n{text}"
 
@@ -164,9 +152,7 @@ def translate_text(text, src_lang_code, tgt_lang_code):
     return translated_text
 
 def fill_translations(df, menu_language):
-    # Identify source language code
     src_code = language_map[menu_language]
-    # Determine other target languages
     target_langs = [lang for lang in language_map.values() if lang != src_code]
 
     translation_columns = {
@@ -176,43 +162,45 @@ def fill_translations(df, menu_language):
         'ItemDescriptionDefault': ['ItemDescriptionEn', 'ItemDescriptionPt', 'ItemDescriptionFr', 'ItemDescriptionDe', 'ItemDescriptionEs']
     }
 
-    # Define language codes more explicitly for translation
-    # We'll translate from src_code to each tgt_code individually.
     code_to_full = {'En': 'English', 'Pt': 'Portuguese', 'Fr': 'French', 'De': 'German', 'Es': 'Spanish'}
 
     for index, row in df.iterrows():
         for default_col, target_cols in translation_columns.items():
             if row[default_col] and str(row[default_col]).strip():
                 for tgt_col, tgt_code in zip(target_cols, ['En', 'Pt', 'Fr', 'De', 'Es']):
-                    # Only translate if empty and target code is different from source code
                     if tgt_code != src_code and (pd.isna(row[tgt_col]) or not str(row[tgt_col]).strip()):
                         translated = translate_text(str(row[default_col]), code_to_full[src_code], code_to_full[tgt_code])
                         df.at[index, tgt_col] = translated
 
 def main():
-    st.title("Menu Converter to Excel with Translation")
+    st.title("Conversor de Menus para Excel com Tradução")
+    st.markdown("""
+    ### Olá! Bem-vindo ao teu conversor de menus!  
+    Aqui podes carregar o teu menu em PDF ou imagem, e este app vai tentar converter tudo para um ficheiro Excel bem organizado. Além disso, vai criar traduções para várias línguas!  
+    **Atenção:** O processo pode demorar entre **5 a 10 minutos**, dependendo do tamanho e complexidade do teu menu. Vai buscar um café, relaxa, e quando voltares já deve estar pronto! 😄
+    """)
 
     uploaded_files = st.file_uploader(
-        "Upload PDF or image files", type=["pdf", "jpg", "jpeg", "png"], accept_multiple_files=True
+        "Carrega aqui o(s) teu(s) ficheiro(s) (PDF ou imagem)", type=["pdf", "jpg", "jpeg", "png"], accept_multiple_files=True
     )
 
     menu_language = st.selectbox(
-        "Select the menu language", 
-        ["British English", "European Portuguese", "European French", "German (Germany)", "European Spanish"]
+        "Escolhe a língua do menu", 
+        ["Inglês Britânico", "Português Europeu", "Francês Europeu", "Alemão (Alemanha)", "Espanhol Europeu"]
     )
 
-    output_filename = st.text_input("Enter the output Excel filename (without extension):")
+    output_filename = st.text_input("Escreve o nome do ficheiro Excel de saída (sem extensão)")
 
-    if st.button("Convert to Excel"):
+    if st.button("Converter para Excel"):
         if not uploaded_files:
-            st.error("Please upload at least one file.")
+            st.error("Por favor, carrega pelo menos um ficheiro.")
             return
         if not output_filename:
-            st.error("Please provide an output filename.")
+            st.error("Por favor, indica o nome do ficheiro de saída.")
             return
 
         language_code = categorize_menu_language(menu_language)
-        st.write(f"Detected language code: {language_code}")
+        st.write(f"Código de língua detetado: {language_code}")
 
         all_images = []
         for uploaded_file in uploaded_files:
@@ -224,19 +212,19 @@ def main():
                 all_images.append(img)
 
         if all_images:
-            with st.spinner("Processing images..."):
+            with st.spinner("A processar imagens... Pode demorar 5-10 minutos, aguenta aí!"):
                 df = process_image_to_excel(all_images, menu_language)
 
-            with st.spinner("Translating menu items..."):
+            with st.spinner("A traduzir o menu... Isto também pode levar algum tempo, obrigado pela paciência!"):
                 fill_translations(df, menu_language)
 
             output_path = f"{output_filename}.xlsx"
             df.to_excel(output_path, index=False)
-            st.success(f"Excel file saved as {output_path}.")
+            st.success(f"Ficheiro Excel gravado como {output_path}.")
 
             with open(output_path, "rb") as f:
                 st.download_button(
-                    label="Download Excel file",
+                    label="Descarregar ficheiro Excel",
                     data=f.read(),
                     file_name=output_path,
                     mime="application/vnd.openxmlformats-officedocument.spreadsheetml.sheet"
