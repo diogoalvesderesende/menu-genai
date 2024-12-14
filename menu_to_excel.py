@@ -6,6 +6,8 @@ from PIL import Image
 import fitz  # PyMuPDF
 from openai import OpenAI
 import re
+import io
+
 
 # Set up OpenAI API
 api_key = st.secrets["openai_api"]
