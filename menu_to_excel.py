@@ -236,8 +236,8 @@ def main():
     st.markdown("<hr style='border:none; height:1px; background-color:#ccc; margin:20px 0;' />", unsafe_allow_html=True)
 
     st.write("Carrega o teu menu (PDF ou imagem) e converte-o para um ficheiro Excel estruturado, com traduções em várias línguas.")
-    st.write("Pode demorar entre 5 a 10 minutos, dependendo do tamanho do menu.")
-    st.write("Pode demorar entre 5 a 10 minutos, dependendo do tamanho do menu.\nPor favor, aguarda pacientemente enquanto o processo decorre.")
+    st.write("Pode demorar entre **5 a 10 minutos**, dependendo do tamanho do menu.")
+    st.write("Por favor, aguarda pacientemente enquanto o processo decorre.")
     
     uploaded_files = st.file_uploader(
         "Carrega aqui o(s) teu(s) ficheiro(s) (PDF ou imagem):", 
