@@ -14,7 +14,7 @@ st.set_page_config(layout="wide")
 MAIN_COLOR = "#163c68"
 SECONDARY_COLOR = "#cddff4"
 
-# CSS minimalista e elegante
+# CSS minimalista e elegante, com mais espaçamento no topo
 st.markdown(f"""
 <style>
 body {{
@@ -28,7 +28,7 @@ body {{
 }}
 .block-container {{
     background-color: #fff !important;
-    padding-top: 20px !important;
+    padding-top: 40px !important; /* Aumenta o espaçamento no topo */
 }}
 h1, h2, h3, h4, h5, h6 {{
     color: {MAIN_COLOR} !important;
@@ -222,20 +222,18 @@ def fill_translations(df, menu_language):
                         df.at[index, tgt_col] = translated
 
 def main():
-    # Logo no canto superior esquerdo (opcional)
+    # Adicionar espaço no topo e alinhar logo e título
     logo = "logo.png"  
     if os.path.exists(logo):
-        cols = st.columns([0.1,1])  # Ajustar tamanho das colunas para logo pequena
-        with cols[0]:
-            st.image(logo, width=60)
-        with cols[1]:
+        col1, col2 = st.columns([0.1, 1])
+        with col1:
+            st.image(logo, use_column_width='auto')
+        with col2:
             st.title("Conversor de Menus para Excel com Tradução")
     else:
         st.title("Conversor de Menus para Excel com Tradução")
 
-    st.markdown("""
-    <hr style="border:none; height:1px; background-color:#ccc; margin:20px 0;" />
-    """, unsafe_allow_html=True)
+    st.markdown("<hr style='border:none; height:1px; background-color:#ccc; margin:20px 0;' />", unsafe_allow_html=True)
 
     st.write("Carrega o teu menu (PDF ou imagem) e converte-o para um ficheiro Excel estruturado, com traduções em várias línguas. Pode demorar entre 5 a 10 minutos, dependendo do tamanho do menu. Por favor, aguarda pacientemente enquanto o processo decorre.")
 
