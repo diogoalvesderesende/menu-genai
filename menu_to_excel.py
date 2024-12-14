@@ -29,20 +29,20 @@ def encode_image(image):
 
 def categorize_menu_language(menu_language):
     prompt = f"""
-    Based on the input '{menu_language}', categorize it as one of the following:
-    - 'En' for English
-    - 'Pt' for Portuguese
-    - 'Fr' for French
-    - 'De' for German
-    - 'Es' for Spanish
-    If the language doesn't match any of these, return 'None'.
-    Please return only the language code.
+    Com base na entrada '{menu_language}', categorize-a como uma das seguintes opções:
+    - 'En' para Inglês
+    - 'Pt' para Português
+    - 'Fr' para Francês
+    - 'De' para Alemão
+    - 'Es' para Espanhol
+    Se o idioma não corresponder a nenhum destes, retorne 'None'.
+    Por favor, retorne apenas o código do idioma.
     """
 
     response = client.chat.completions.create(
         model=MODEL2,
         messages=[
-            {"role": "system", "content": "You are a helpful assistant that categorizes language input."},
+            {"role": "system", "content": "Você é um assistente útil que categoriza entradas de idioma."},
             {"role": "user", "content": prompt}
         ],
         temperature=0
@@ -56,12 +56,12 @@ def process_image_to_excel(images, menu_language):
     ])
 
     system_prompt = f"""
-    Convert the menu image to a structured Excel sheet format following the provided template.
-    The menu's language is {menu_language}.
+    Converta a imagem do menu para um formato estruturado de planilha Excel seguindo o modelo fornecido.
+    O idioma do menu é {menu_language}.
     """
 
     for img in images:
-        with st.spinner(f"Processing image..."):
+        with st.spinner(f"Processando imagem..."):
             buffered = io.BytesIO()
             img.save(buffered, format="JPEG")
             base64_image = base64.b64encode(buffered.getvalue()).decode("utf-8")
@@ -86,26 +86,26 @@ def process_image_to_excel(images, menu_language):
 
 # Streamlit App
 def main():
-    st.title("Menu to Excel Converter")
+    st.title("Conversor de Menu para Excel")
 
     uploaded_files = st.file_uploader(
-        "Upload PDF or Image Files", type=["pdf", "jpg", "jpeg", "png"], accept_multiple_files=True
+        "Carregue arquivos PDF ou de imagem", type=["pdf", "jpg", "jpeg", "png"], accept_multiple_files=True
     )
 
     menu_language = st.selectbox(
-        "Select the language of the menu", ["English", "Portuguese", "French", "German", "Spanish"]
+        "Selecione o idioma do menu", ["Inglês Britânico", "Português Europeu", "Francês Europeu", "Alemão da Alemanha", "Espanhol Europeu"]
     )
 
-    output_filename = st.text_input("Enter the name for the output Excel file (without extension):")
+    output_filename = st.text_input("Insira o nome para o arquivo Excel de saída (sem extensão):")
 
-    if st.button("Convert to Excel"):
+    if st.button("Converter para Excel"):
         if not uploaded_files:
-            st.error("Please upload at least one file.")
+            st.error("Por favor, carregue pelo menos um arquivo.")
         elif not output_filename:
-            st.error("Please specify the output file name.")
+            st.error("Por favor, especifique o nome do arquivo de saída.")
         else:
             language_code = categorize_menu_language(menu_language)
-            st.write(f"Detected language code: {language_code}")
+            st.write(f"Código de idioma detectado: {language_code}")
 
             all_images = []
             for uploaded_file in uploaded_files:
@@ -120,9 +120,9 @@ def main():
                 df = process_image_to_excel(all_images, menu_language)
                 output_path = f"{output_filename}.xlsx"
                 df.to_excel(output_path, index=False)
-                st.success(f"Excel file saved as {output_path}.")
+                st.success(f"Arquivo Excel salvo como {output_path}.")
                 st.download_button(
-                    label="Download Excel File",
+                    label="Baixar arquivo Excel",
                     data=open(output_path, "rb").read(),
                     file_name=output_path,
                     mime="application/vnd.openxmlformats-officedocument.spreadsheetml.sheet"
