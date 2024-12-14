@@ -29,9 +29,13 @@ def pdf_to_jpeg(pdf_file):
 
 # Encode PIL image to base64
 def encode_image_pil(img):
+    # Ensure the image is in RGB mode for JPEG
+    if img.mode != "RGB":
+        img = img.convert("RGB")
     buffered = io.BytesIO()
     img.save(buffered, format="JPEG")
     return base64.b64encode(buffered.getvalue()).decode("utf-8")
+
 
 # Categorize menu language
 def categorize_menu_language(menu_language):
