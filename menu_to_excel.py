@@ -64,11 +64,12 @@ def process_image_to_excel(images, menu_language):
 
     system_prompt = f"""
 Convert the menu image to a structured table with columns:
-- CategoryTitleDefault
-- SubcategoryTitleDefault
-- ItemNameDefault
-- ItemDescriptionDefault
-- ItemPrice
+- CategoryTitleDefault (Column A) - Category Title: The default category title displayed on your menu (text, max 30 characters).
+- SubcategoryTitleDefault  (Column B) - Subcategory Title (Optional): Subcategory titles displayed on your menu (text, max 30 characters).
+- ItemNameDefault (Column C) - Item Name : The default item name displayed on your menu (text, max 40 characters).
+- ItemDescriptionDefault (Column D) - Item Description (Optional): The default item description displayed on your menu (text, max 120 characters).
+- ItemPrice (Column E) - Item Price: Price of each item (Text). Remove currency symbols and only include numbers (example of formats: 9.99 or 9.9 or 9 or 9,99 or 9,9 or 9)
+
 
 The menu language is {menu_language}.
 If the menu has multiple languages, only use the {menu_language} portion.
@@ -143,7 +144,7 @@ def translate_text(text, src_lang_code, tgt_lang_code):
         return translation_cache[cache_key]
 
     # Simple translation prompt
-    system_prompt = f"You are a translator. Translate from {src_lang_code} to {tgt_lang_code}. Return only the translated text."
+    system_prompt = f"You are a translator for a restaurant. Assume the intended meaning is restaurant vocabulary. Translate from {src_lang_code} to {tgt_lang_code}. Return only the translated text."
     user_prompt = f"Translate this text:\n{text}"
 
     response = client.chat.completions.create(
