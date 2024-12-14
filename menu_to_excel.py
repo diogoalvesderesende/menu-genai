@@ -227,15 +227,15 @@ def main():
     if os.path.exists(logo):
         col1, col2 = st.columns([0.1, 1])
         with col1:
-            st.image(logo, use_column_width='auto')
+            st.image(logo, use_container_width='auto')
         with col2:
             st.title("Conversor de Menus para Excel com Tradução")
     else:
-        st.title("Conversor de Menus para Excel com Tradução")
+        st.title("Conversor de Menus para Excel com Tradução da Bitte")
 
     st.markdown("<hr style='border:none; height:1px; background-color:#ccc; margin:20px 0;' />", unsafe_allow_html=True)
 
-    st.write("Carrega o teu menu (PDF ou imagem) e converte-o para um ficheiro Excel estruturado, com traduções em várias línguas. Pode demorar entre 5 a 10 minutos, dependendo do tamanho do menu. Por favor, aguarda pacientemente enquanto o processo decorre.")
+    st.write("Carrega o teu menu (PDF ou imagem) e converte-o para um ficheiro Excel estruturado, com traduções em várias línguas.\nPode demorar entre 5 a 10 minutos, dependendo do tamanho do menu.\nPor favor, aguarda pacientemente enquanto o processo decorre.")
 
     uploaded_files = st.file_uploader(
         "Carrega aqui o(s) teu(s) ficheiro(s) (PDF ou imagem):", 
