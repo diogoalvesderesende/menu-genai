@@ -8,7 +8,54 @@ from openai import OpenAI
 import re
 import io
 
-# Configuração da API OpenAI
+# Configuração da página e estilos
+st.set_page_config(layout="wide")
+
+# Cores fornecidas
+MAIN_COLOR = "#163c68"
+SECONDARY_COLOR = "#cddff4"
+
+# CSS para estilizar a página
+st.markdown(f"""
+<style>
+body {{
+    background-color: {SECONDARY_COLOR} !important;
+    color: #000 !important;
+    font-family: "Helvetica", sans-serif;
+}}
+.sidebar .sidebar-content {{
+    background-color: {MAIN_COLOR} !important;
+    color: #fff !important;
+}}
+.block-container {{
+    background-color: {SECONDARY_COLOR} !important;
+    padding-top: 0px !important;
+}}
+h1, h2, h3, h4, h5, h6 {{
+    color: {MAIN_COLOR} !important;
+}}
+.st-download-button {{
+    background-color: {MAIN_COLOR} !important;
+    color: #fff !important;
+    border-radius: 5px;
+}}
+.st-download-button:hover {{
+    background-color: #0f2a49 !important;
+    color: #fff !important;
+}}
+.st-button > button:first-child {{
+    background-color: {MAIN_COLOR} !important;
+    color: #fff;
+    border-radius: 5px;
+}}
+.st-button > button:first-child:hover {{
+    background-color: #0f2a49 !important;
+    color: #fff;
+}}
+</style>
+""", unsafe_allow_html=True)
+
+# Set up OpenAI API
 api_key = st.secrets["openai_api"]
 client = OpenAI(api_key=api_key)
 MODEL = "gpt-4o"
@@ -27,7 +74,6 @@ def pdf_to_jpeg(pdf_file):
     return images
 
 def encode_image_pil(img):
-    # Garantir que a imagem está em modo RGB para JPEG
     if img.mode != "RGB":
         img = img.convert("RGB")
     buffered = io.BytesIO()
@@ -63,15 +109,14 @@ def process_image_to_excel(images, menu_language):
 
     system_prompt = f"""
 Convert the menu image to a structured table with columns:
-- CategoryTitleDefault (Column A) - Category Title: The default category title displayed on your menu (text, max 30 characters).
-- SubcategoryTitleDefault  (Column B) - Subcategory Title (Optional): Subcategory titles displayed on your menu (text, max 30 characters).
-- ItemNameDefault (Column C) - Item Name : The default item name displayed on your menu (text, max 40 characters).
-- ItemDescriptionDefault (Column D) - Item Description (Optional): The default item description displayed on your menu (text, max 120 characters).
-- ItemPrice (Column E) - Item Price: Price of each item (Text). Remove currency symbols and only include numbers (example of formats: 9.99 or 9.9 or 9 or 9,99 or 9,9 or 9)
-
+- CategoryTitleDefault (Column A) - Category Title
+- SubcategoryTitleDefault (Column B) - Subcategory Title (Optional)
+- ItemNameDefault (Column C) - Item Name
+- ItemDescriptionDefault (Column D) - Item Description (Optional)
+- ItemPrice (Column E) - Item Price (just numbers, no currency)
 
 The menu language is {menu_language}.
-If the menu has multiple languages, only use the {menu_language} portion.
+If multiple languages, only use the {menu_language} portion.
 
 Output in Markdown table format:
 | CategoryTitleDefault | SubcategoryTitleDefault | ItemNameDefault | ItemDescriptionDefault | ItemPrice |
@@ -173,15 +218,22 @@ def fill_translations(df, menu_language):
                         df.at[index, tgt_col] = translated
 
 def main():
+    # Logotipo no canto superior esquerdo
+    logo = "logo.png"  # Ajuste o nome do ficheiro se necessário
+    st.image(logo, width=80)
+
     st.title("Conversor de Menus para Excel com Tradução")
-    st.markdown("""
-    ### Olá! Bem-vindo ao teu conversor de menus!  
-    Aqui podes carregar o teu menu em PDF ou imagem, e este app vai tentar converter tudo para um ficheiro Excel bem organizado. Além disso, vai criar traduções para várias línguas!  
-    **Atenção:** O processo pode demorar entre **5 a 10 minutos**, dependendo do tamanho e complexidade do teu menu. Vai buscar um café, relaxa, e quando voltares já deve estar pronto! 😄
-    """)
+    st.markdown(f"""
+    <div style="background-color:{MAIN_COLOR}; padding:10px; border-radius:5px; margin-bottom:20px;">
+    <h3 style="color:#fff;">Olá! Bem-vindo ao teu conversor de menus!</h3>
+    <p style="color:#fff;">Aqui podes carregar o teu menu em PDF ou imagem, e este app vai tentar converter tudo para um ficheiro Excel bem organizado. Além disso, vai criar traduções para várias línguas!</p>
+    <p style="color:#fff;"><strong>Atenção:</strong> O processo pode demorar entre <strong>5 a 10 minutos</strong>, dependendo do tamanho e complexidade do teu menu. Vai buscar um café, relaxa, e quando voltares já deve estar pronto! 😄</p>
+    </div>
+    """, unsafe_allow_html=True)
 
     uploaded_files = st.file_uploader(
-        "Carrega aqui o(s) teu(s) ficheiro(s) (PDF ou imagem)", type=["pdf", "jpg", "jpeg", "png"], accept_multiple_files=True
+        "Carrega aqui o(s) teu(s) ficheiro(s) (PDF ou imagem)", 
+        type=["pdf", "jpg", "jpeg", "png"], accept_multiple_files=True
     )
 
     menu_language = st.selectbox(
