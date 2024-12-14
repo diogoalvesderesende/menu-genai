@@ -11,25 +11,24 @@ import io
 # Configuração da página e estilos
 st.set_page_config(layout="wide")
 
-# Cores fornecidas
 MAIN_COLOR = "#163c68"
 SECONDARY_COLOR = "#cddff4"
 
-# CSS para estilizar a página
+# CSS minimalista e elegante
 st.markdown(f"""
 <style>
 body {{
-    background-color: {SECONDARY_COLOR} !important;
-    color: #000 !important;
+    background-color: #fff !important;
     font-family: "Helvetica", sans-serif;
+    color: #000;
 }}
 .sidebar .sidebar-content {{
-    background-color: {MAIN_COLOR} !important;
-    color: #fff !important;
+    background-color: #f9f9f9 !important;
+    color: #000 !important;
 }}
 .block-container {{
-    background-color: {SECONDARY_COLOR} !important;
-    padding-top: 0px !important;
+    background-color: #fff !important;
+    padding-top: 20px !important;
 }}
 h1, h2, h3, h4, h5, h6 {{
     color: {MAIN_COLOR} !important;
@@ -37,20 +36,25 @@ h1, h2, h3, h4, h5, h6 {{
 .st-download-button {{
     background-color: {MAIN_COLOR} !important;
     color: #fff !important;
-    border-radius: 5px;
+    border-radius: 4px;
+    border: none;
 }}
 .st-download-button:hover {{
-    background-color: #0f2a49 !important;
+    background-color: #122b4b !important;
     color: #fff !important;
 }}
 .st-button > button:first-child {{
     background-color: {MAIN_COLOR} !important;
     color: #fff;
-    border-radius: 5px;
+    border-radius: 4px;
+    border: none;
 }}
 .st-button > button:first-child:hover {{
-    background-color: #0f2a49 !important;
+    background-color: #122b4b !important;
     color: #fff;
+}}
+.uploadedFileInfo {{
+    color: #555 !important;
 }}
 </style>
 """, unsafe_allow_html=True)
@@ -218,30 +222,34 @@ def fill_translations(df, menu_language):
                         df.at[index, tgt_col] = translated
 
 def main():
-    # Logotipo no canto superior esquerdo
-    logo = "logo.png"  # Ajuste o nome do ficheiro se necessário
-    st.image(logo, width=80)
+    # Logo no canto superior esquerdo (opcional)
+    logo = "logo.png"  
+    if os.path.exists(logo):
+        cols = st.columns([0.1,1])  # Ajustar tamanho das colunas para logo pequena
+        with cols[0]:
+            st.image(logo, width=60)
+        with cols[1]:
+            st.title("Conversor de Menus para Excel com Tradução")
+    else:
+        st.title("Conversor de Menus para Excel com Tradução")
 
-    st.title("Conversor de Menus para Excel com Tradução")
-    st.markdown(f"""
-    <div style="background-color:{MAIN_COLOR}; padding:10px; border-radius:5px; margin-bottom:20px;">
-    <h3 style="color:#fff;">Olá! Bem-vindo ao teu conversor de menus!</h3>
-    <p style="color:#fff;">Aqui podes carregar o teu menu em PDF ou imagem, e este app vai tentar converter tudo para um ficheiro Excel bem organizado. Além disso, vai criar traduções para várias línguas!</p>
-    <p style="color:#fff;"><strong>Atenção:</strong> O processo pode demorar entre <strong>5 a 10 minutos</strong>, dependendo do tamanho e complexidade do teu menu. Vai buscar um café, relaxa, e quando voltares já deve estar pronto! 😄</p>
-    </div>
+    st.markdown("""
+    <hr style="border:none; height:1px; background-color:#ccc; margin:20px 0;" />
     """, unsafe_allow_html=True)
 
+    st.write("Carrega o teu menu (PDF ou imagem) e converte-o para um ficheiro Excel estruturado, com traduções em várias línguas. Pode demorar entre 5 a 10 minutos, dependendo do tamanho do menu. Por favor, aguarda pacientemente enquanto o processo decorre.")
+
     uploaded_files = st.file_uploader(
-        "Carrega aqui o(s) teu(s) ficheiro(s) (PDF ou imagem)", 
+        "Carrega aqui o(s) teu(s) ficheiro(s) (PDF ou imagem):", 
         type=["pdf", "jpg", "jpeg", "png"], accept_multiple_files=True
     )
 
     menu_language = st.selectbox(
-        "Escolhe a língua do menu", 
+        "Escolhe a língua do menu:", 
         ["Inglês Britânico", "Português Europeu", "Francês Europeu", "Alemão (Alemanha)", "Espanhol Europeu"]
     )
 
-    output_filename = st.text_input("Escreve o nome do ficheiro Excel de saída (sem extensão)")
+    output_filename = st.text_input("Nome do ficheiro Excel de saída (sem extensão):")
 
     if st.button("Converter para Excel"):
         if not uploaded_files:
@@ -264,10 +272,10 @@ def main():
                 all_images.append(img)
 
         if all_images:
-            with st.spinner("A processar imagens... Pode demorar 5-10 minutos, aguenta aí!"):
+            with st.spinner("A processar imagens... Pode demorar vários minutos"):
                 df = process_image_to_excel(all_images, menu_language)
 
-            with st.spinner("A traduzir o menu... Isto também pode levar algum tempo, obrigado pela paciência!"):
+            with st.spinner("A traduzir o menu... Isto também pode levar algum tempo"):
                 fill_translations(df, menu_language)
 
             output_path = f"{output_filename}.xlsx"
