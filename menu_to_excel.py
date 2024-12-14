@@ -229,7 +229,7 @@ def main():
         with col1:
             st.image(logo, use_container_width='auto')
         with col2:
-            st.title("Conversor de Menus para Excel com Tradução")
+            st.title("Conversor AI de Menus para Excel com Tradução da Bitte")
     else:
         st.title("Conversor de Menus para Excel com Tradução da Bitte")
 
