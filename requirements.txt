@@ -1,0 +1,5 @@
+streamlit== 1.41.0
+pandas==2.2.2
+Pillow==11.0.0
+PyMuPDF==1.25.1
+openai==1.55.3
