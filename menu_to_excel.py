@@ -30,8 +30,10 @@ body {{
     background-color: #fff !important;
     padding-top: 40px !important; /* Aumenta o espaçamento no topo */
 }}
-h1, h2, h3, h4, h5, h6 {{
+h1 {{
+    font-size: 1.25rem !important; /* Decrease title size */
     color: {MAIN_COLOR} !important;
+    margin: 0; /* Optional: Remove extra margin */
 }}
 .st-download-button {{
     background-color: {MAIN_COLOR} !important;
@@ -56,8 +58,18 @@ h1, h2, h3, h4, h5, h6 {{
 .uploadedFileInfo {{
     color: #555 !important;
 }}
+img.logo {{
+    max-height: 50px; /* Matches the title size */
+    margin-right: 10px; /* Spacing between logo and title */
+}}
+.header {{
+    display: flex;
+    align-items: center;
+    gap: 10px; /* Adjust spacing between logo and title */
+}}
 </style>
 """, unsafe_allow_html=True)
+
 
 # Set up OpenAI API
 api_key = st.secrets["openai_api"]
