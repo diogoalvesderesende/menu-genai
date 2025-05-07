@@ -124,7 +124,7 @@ def process_image_to_excel(images, menu_language):
     ])
 
     system_prompt = f"""
-Convert the menu image to a structured table with columns:
+    Your goal is to convert the menu image to a structured table with columns:
 - CategoryTitleDefault (Column A) - Category Title: The default category title displayed on your menu (text, max 40 characters).
 - SubcategoryTitleDefault  (Column B) - Subcategory Title (Optional): Subcategory titles displayed on your menu (text, max 40 characters).
 - ItemNameDefault (Column C) - Item Name : The default item name displayed on your menu (text, max 40 characters).
@@ -132,7 +132,6 @@ Convert the menu image to a structured table with columns:
 - ItemPrice (Column E) - Item Price: Price of each item (Text). Remove currency symbols and only include numbers (example of formats: 9.99 or 9.9 or 9 or 9,99 or 9,9 or 9)
 
 The menu language is {menu_language}.
-If multiple languages, only use the {menu_language} portion.
 
 Output in Markdown table format:
 | CategoryTitleDefault | SubcategoryTitleDefault | ItemNameDefault | ItemDescriptionDefault | ItemPrice |
