@@ -125,8 +125,8 @@ def process_image_to_excel(images, menu_language):
 
     system_prompt = f"""
 Convert the menu image to a structured table with columns:
-- CategoryTitleDefault (Column A) - Category Title: The default category title displayed on your menu (text, max 30 characters).
-- SubcategoryTitleDefault  (Column B) - Subcategory Title (Optional): Subcategory titles displayed on your menu (text, max 30 characters).
+- CategoryTitleDefault (Column A) - Category Title: The default category title displayed on your menu (text, max 40 characters).
+- SubcategoryTitleDefault  (Column B) - Subcategory Title (Optional): Subcategory titles displayed on your menu (text, max 40 characters).
 - ItemNameDefault (Column C) - Item Name : The default item name displayed on your menu (text, max 40 characters).
 - ItemDescriptionDefault (Column D) - Item Description (Optional): The default item description displayed on your menu (text, max 120 characters).
 - ItemPrice (Column E) - Item Price: Price of each item (Text). Remove currency symbols and only include numbers (example of formats: 9.99 or 9.9 or 9 or 9,99 or 9,9 or 9)
